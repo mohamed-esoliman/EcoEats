@@ -14,9 +14,15 @@ const Recipes = ({foodRecipes}) => {
                     {foodRecipes.map((recipe, index) => {
                         return (
                             <div key={index} className="recipe">
-                                <h2>{recipe.title}</h2>
-                                <p>{recipe.description}</p>
-                                <p>{recipe.nutrition}</p>
+                                <div className="left">
+                                    <h2>{recipe.title}</h2>
+                                    <p>{recipe.description}</p>
+                                </div>
+                                <div className="right">
+                                    <h3>Nutrition Facts</h3>
+                                    {/* <p>{recipe.nutrition.replace(/, /g, '\n')}</p> */}
+                                    <p>{recipe.nutrition}</p>
+                                </div>
                             </div>
                         )
                     })}

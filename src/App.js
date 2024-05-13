@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Home from "./components/Home";
 import Recipes from "./components/Recipes";
+import Footer from "./components/Footer";
 
 function App() {
 
@@ -119,6 +120,7 @@ function App() {
         <Route path="/" element={<Home prompt={prompt} changePrompt={handlePromptChange} response={response} changeResponse={handleResponseChange} form1Submit = {handleImageSubmit} form2Submit={handleChatSubmit} displayImage = {image} updateImage = {handleImageChange}/>} />
         <Route path="/recipes" element={<Recipes foodRecipes={recipes} updateRecipes={handleRecipesChange}/>} />
       </Routes>
+      <Footer />
       </div>
     </Router>
   );

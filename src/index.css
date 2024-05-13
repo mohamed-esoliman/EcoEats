@@ -61,14 +61,25 @@ button {
 
 button:hover {
   background-color: #333;
+  transition: ease-in-out 0.1s;
 }
 
-.home .img{
-  margin-top: 32px;
-  width: 60%;
+.home .image{
+  width: 80%;
   height: 60%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+}
+
+.home .image form{
+  margin-bottom: 18px;
+}
+
+.home .img {
+  width: 50%;
+  height: 60%;
 }
 
 .home .img img {
@@ -76,22 +87,125 @@ button:hover {
   height: 100%;
 }
 
+.home .chat{
+  width: 80%;
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home .chat form{
+  margin-bottom: 18px;
+  height: 50%;
+  width: 60%
+}
+
+.home .chat input {
+  width: 100%;
+  height: 80%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+}
+
 .recipes {
-  padding-top: 12px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100vh;
 }
 
+.recipes h1 {
+  margin-bottom: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+}
+
 .recipes .recipesList {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: auto;
-  width: 80%;
-  margin-bottom: 16px;
+}
+
+.recipes .recipesList .recipe {
+  display: flex;
+  flex-direction: row;
+  padding: 18px;
+  width: 90%;
+  background-color: #fff;
+  border-radius: 12px;
+  margin: 12px;
+}
+
+.recipes .recipesList .recipe:hover {
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+  background-color: green;
+  color: #ffffff;
+  cursor: pointer;
+  transition: ease-in 0.15s;
+}
+
+.recipes .recipesList .recipe .left {
+  width: 85%;
+  text-align: justify;
+  border-right: #26272b 1.5px solid;
+  padding-right: 10px;
+}
+
+.recipes .recipesList .recipe .right {
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.recipes .recipesList .recipe .right:hover {
+  color: black;
 }
 
 
+.recipes button {
+  padding: 12px;
+  width: auto;
+  height: auto;
+  background-color: green;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 16px;
+} 
+
+.recipes button:hover {
+  background-color: #333;
+  transition: ease-in-out 0.1s;
+}
+
+
+
+
+/* footer */
+
+.siteFooter {
+  background-color: #26272b;
+  padding: 45px 0 20px;
+  font-size: 15px;
+  line-height: 24px;
+  color: #737373;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.siteFooter p {
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 24px;
+  margin: 0 12px 6px 12px;
+}

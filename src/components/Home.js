@@ -20,6 +20,7 @@ const Home = ({prompt, response, changePrompt, changeResponse, form1Submit, form
             </div>
             <div className="chat">
                 <form className="form2" onSubmit={(e) => form2Submit(e, navigate('/Recipes'))}>
+                    <p>Or enter your ingredients manually:</p>
                     <input type="text" name="message" value={prompt} onChange={(e) => {changePrompt(e)}}/>
                     <button type="submit">Submit</button>
                 </form>
