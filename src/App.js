@@ -75,11 +75,9 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: prompt }),
+        body: JSON.stringify({ message: `Given these ingredients, provide some recipes that I can make:\n${prompt}` }),
       });
       const data = await response.json();
-      console.log(data);
-      handleResponseChange(data.choices[0].message.content[0].content.text);
       setRecipes([data.choices[0].message.content]);
     }
     catch (error) {

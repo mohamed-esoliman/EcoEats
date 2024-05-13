@@ -23,9 +23,6 @@ const Home = ({prompt, response, changePrompt, changeResponse, form1Submit, form
                     <input type="text" name="message" value={prompt} onChange={(e) => {changePrompt(e)}}/>
                     <button type="submit">Submit</button>
                 </form>
-                <div className="response">
-                    <p>{response}</p>
-                </div>
             </div>
         </div>
     );

@@ -71,10 +71,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-  console.log("reached chat endpoint");
 
   const { message } = req.body;
-  console.log("message:", message);
 
   const completion = await openai.chat.completions.create({messages: [
     {role: "system", content: "You are a helpful assistant."},
@@ -84,7 +82,7 @@ app.post('/chat', async (req, res) => {
     max_tokens: 512,
     temperature: 0,});
 
-  res.send(completion.choices[0]);
+  res.send(completion);
 });
 
 
