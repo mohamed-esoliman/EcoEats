@@ -11,7 +11,12 @@ const Home = ({prompt, response, changePrompt, changeResponse, form1Submit, form
         <div className="home">
             <div className="image">
                 <form className="form1" onSubmit={(e) => {form1Submit(e, () => {navigate('/Recipes')})}}>
-                    <input type="file" name="image" onChange={(e) => {updateImage(e)}} multiple />
+                    <input type="file" name="image" accept="image/*" onChange={(e) => {updateImage(e)}} multiple />
+                    <button type="submit">Submit</button>
+                </form>
+                <p>Or capture directly from your camera:</p>
+                <form className="form1" onSubmit={(e) => {form1Submit(e, () => {navigate('/Recipes')})}}>
+                    <input type="file" accept="image/*" name="image" capture="camera" onChange={(e) => {updateImage(e)}} multiple />
                     <button type="submit">Submit</button>
                 </form>
                 <div className="img">

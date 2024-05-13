@@ -10,11 +10,46 @@ body {
 }
 
 nav {
+  display: flex;
   width: 100%;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   background-color: green;
+}
+
+nav .header{
+  width: 40%;
+}
+
+nav .links{
+  width: 60%;
+}
+
+nav .links ul{
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  list-style: none;
+  line-height: 12px;
+  margin-right: 20px;
+}
+
+nav .links ul li {
+  margin-right: 12px;
+  margin-left: 12px;
+}
+
+nav .links ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  transition: ease-in-out 0.1s;
+}
+
+nav .links ul li a:hover {
+  color: #333;
 }
 
 nav span {
@@ -162,6 +197,7 @@ button:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding-left: 12px;
 }
 
 .recipes .recipesList .recipe .right:hover {
