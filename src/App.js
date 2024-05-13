@@ -117,11 +117,13 @@ function App() {
     <Router>
       <div className="App">
       <NavBar />
-      <Routes>
-        <Route path="/" element={<Home prompt={prompt} changePrompt={handlePromptChange} response={response} changeResponse={handleResponseChange} form1Submit = {handleImageSubmit} form2Submit={handleChatSubmit} displayImage = {image} updateImage = {handleImageChange}/>} />
-        <Route path="/recipes" element={<Recipes foodRecipes={recipes} updateRecipes={handleRecipesChange}/>} />
-        <Route path="/inventory" element={<Inventory />} />
-      </Routes>
+      <div className="content">
+        <Routes>
+          <Route path="/" element={<Home prompt={prompt} changePrompt={handlePromptChange} response={response} changeResponse={handleResponseChange} form1Submit = {handleImageSubmit} form2Submit={handleChatSubmit} displayImage = {image} updateImage = {handleImageChange}/>} />
+          <Route path="/recipes" element={<Recipes foodRecipes={recipes} updateRecipes={handleRecipesChange}/>} />
+          <Route path="/inventory" element={<Inventory />} />
+        </Routes>
+      </div>
       <Footer />
       </div>
     </Router>
