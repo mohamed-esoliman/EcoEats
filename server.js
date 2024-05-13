@@ -47,7 +47,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
           "content": [
             {
               "type": "text",
-              "text": "Given the ingredients in this picture, provide some recipes I can make."
+              "text": "Given the ingredients in this picture, provide some recipes I can make.\nPlease provide recipes in the following JSON format:\n{'title': 'Recipe Title','description': 'Detailed description of the recipe.', 'nutrition': 'Calories: xyz, Carbs: xyz g, Protein: xyz g, Fat: xyz g'}\n Don't add any additional text or to allow easy parsing. Never send cut off JSON string. If you are going to run out of tokens, close the needed brackets to avoid problems."
             },
             {
               "type": "image_url",
@@ -58,7 +58,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
           ]
         }
       ],
-      "max_tokens": 300
+      "max_tokens": 1024,
     }
 
 

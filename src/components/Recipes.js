@@ -8,12 +8,20 @@ const Recipes = ({foodRecipes}) => {
     return (
         <div className="recipes">
             <h1>Recipes</h1>
-            <div className="recipesList">
-                {foodRecipes && foodRecipes.length > 0?<ul>
+            <div className="recipesCheck">
+                {foodRecipes && foodRecipes.length > 0?
+                <div className="recipesList">
                     {foodRecipes.map((recipe, index) => {
-                        return <li key={index}>{recipe}</li>
+                        return (
+                            <div key={index} className="recipe">
+                                <h2>{recipe.title}</h2>
+                                <p>{recipe.description}</p>
+                                <p>{recipe.nutrition}</p>
+                            </div>
+                        )
                     })}
-                </ul>:<p>No recipes yet. Wait until we prepare them...</p>}
+                </div>
+                :<p>No recipes yet. Wait until we prepare them...</p>}
             </div>
             <button onClick={() => {navigate("/")}}>Go back</button>
 

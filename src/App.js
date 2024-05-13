@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Home from "./components/Home";
-import Recipes from "./components/Recipes"; 
-import axios from "axios";
+import Recipes from "./components/Recipes";
 
 function App() {
 
@@ -49,9 +48,12 @@ function App() {
       });
 
       const data = await response.json();
-      console.log(data);
-      setRecipes([data.choices[0].message.content]);
-      console.log("recipes:", recipes); 
+      const responseText = data.choices[0].message.content
+      
+      const validJson = responseText.replace(/'/g, '"').replace(/}\s*{/g, '},{');
+      const newRecipes = JSON.parse(`[${validJson}]`); 
+      
+      setRecipes(newRecipes);
     } 
     catch (error) {
       console.error('Error:', error);
@@ -75,10 +77,17 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: `Given these ingredients, provide some recipes that I can make:\n${prompt}` }),
+        body: JSON.stringify({ message: `Given these ingredients: ${prompt}, provide some recipes I can make.\nPlease provide recipes in the following JSON format:\n{'title': 'Recipe Title','description': 'Detailed description of the recipe.', 'nutrition': 'Calories: xyz, Carbs: xyz g, Protein: xyz g, Fat: xyz g'}\n Don't add any additional text or to allow easy parsing. Never send cut off JSON string. If you are going to run out of tokens, close the needed brackets to avoid problems.`}),
       });
+      
       const data = await response.json();
-      setRecipes([data.choices[0].message.content]);
+      const responseText = data.choices[0].message.content
+      
+      const validJson = responseText.replace(/'/g, '"').replace(/}\s*{/g, '},{');
+      const newRecipes = JSON.parse(`[${validJson}]`); 
+
+
+      setRecipes(newRecipes);
     }
     catch (error) {
       console.error('Error:', error);
