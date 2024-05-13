@@ -88,8 +88,15 @@ function App() {
       const validJson = responseText.replace(/'/g, '"').replace(/}\s*{/g, '},{');
       const newRecipes = JSON.parse(`[${validJson}]`); 
 
+      console.log('prompt:', prompt);
+      console.log('data:', data);
+      console.log('responseText:', responseText);
+      console.log('validJson:', validJson);
+      console.log('newRecipes:', newRecipes);
 
       setRecipes(newRecipes);
+
+      console.log('newRecipes:', recipes);
     }
     catch (error) {
       console.error('Error:', error);
