@@ -4,7 +4,7 @@ const NavBar = () => {
     return ( 
         <nav>
             <div className="header">
-                <span>WasteNotFood</span>
+                <span>EcoEats</span>
                 <p>Never waste food again!</p>
             </div>
             <div className="links">

@@ -93,10 +93,12 @@ function App() {
       console.log('responseText:', responseText);
       console.log('validJson:', validJson);
       console.log('newRecipes:', newRecipes);
-
+      console.log("This is before clearing",recipes);
+      setRecipes([]);
+      console.log("This is after clearing ", recipes);
       setRecipes(newRecipes);
 
-      console.log('newRecipes:', recipes);
+      console.log('This is the newRecipes:', recipes);
     }
     catch (error) {
       console.error('Error:', error);
