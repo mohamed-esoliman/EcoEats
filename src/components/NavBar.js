@@ -5,7 +5,7 @@ const NavBar = () => {
         <nav>
             <div className="header">
                 <span>EcoEats</span>
-                <p>Never waste food again!</p>
+                <p>Your sustainable kitchen companion: preventing food waste with every recipe!</p>
             </div>
             <div className="links">
                 <ul>
