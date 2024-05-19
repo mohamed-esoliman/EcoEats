@@ -2,87 +2,200 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 const OpenAI = require('openai');
 const multer = require('multer');
 const fs = require('fs');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
 
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// OpenAI configuration
-const openai = new OpenAI({
-  apiKey: process.env.OpenAIApiKey
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = 'uploads';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueFilename = `${uuidv4()}${path.extname(file.originalname)}`;
+    cb(null, uniqueFilename);
+  }
 });
 
-// Image upload and processing endpoint
-app.post('/upload', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded.' });
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG and JPG are allowed.'), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+const errorHandler = (err, req, res, next) => {
+  console.error('Error:', err);
+
+  if (
+    err.name === 'OpenAIError' ||
+    (err.status === 401) ||
+    (err.message && err.message.toLowerCase().includes('api key'))
+  ) {
+    return res.status(401).json({
+      status: 'error',
+      error: 'Invalid API key. Please check your API key in settings.'
+    });
   }
 
-  try {
-    const imagePath = req.file.path;
-    const base64Image = fs.readFileSync(imagePath, { encoding: 'base64' });
+  res.status(err.status || 500).json({
+    status: 'error',
+    error: 'An unexpected error occurred. Please try again.'
+  });
+};
 
-    const payload = {
-      model: "gpt-4-vision-preview",
-      messages: [
+app.post('/api/generate-recipe', upload.single('image'), async (req, res, next) => {
+  let imagePath = null;
+  
+  try {
+    const apiKey = req.body.apiKey;
+    if (!apiKey) {
+      throw { 
+        status: 401, 
+        message: 'API key is required. Please set your OpenAI API key in settings.' 
+      };
+    }
+
+    const openai = new OpenAI({ apiKey });
+
+    try {
+      await openai.models.list();
+    } catch (error) {
+      if (error.name === 'OpenAIError') {
+        throw { 
+          status: 401, 
+          message: 'Invalid API key. Please check your API key in settings.' 
+        };
+      }
+      throw error;
+    }
+
+    let prompt = '';
+    let messages = [];
+
+    if (req.file) {
+      imagePath = req.file.path;
+      const mimeType = req.file.mimetype; // dynamically get MIME type
+      const base64Image = fs.readFileSync(imagePath, { encoding: 'base64' });
+      
+      prompt = `Given the ingredients in this picture, create a detailed recipe. Include:
+1. A creative title
+2. A brief description
+3. A list of ingredients with quantities
+4. Step-by-step instructions
+5. Basic nutrition information (calories, protein, carbs, fat)
+
+Format the response as a valid JSON object with the following structure:
+{
+  "title": "Recipe Title",
+  "description": "Brief description",
+  "ingredients": ["ingredient 1", "ingredient 2", ...],
+  "instructions": ["step 1", "step 2", ...],
+  "nutrition": "Calories: X, Protein: Xg, Carbs: Xg, Fat: Xg"
+}`;
+
+      messages = [
         {
           role: "user",
           content: [
-            {
-              type: "text",
-              text: "Given the ingredients in this picture, provide some recipes I can make. Please provide recipes in the following JSON format: {'title': 'Recipe Title','description': 'Detailed description of the recipe.', 'nutrition': 'Calories: xyz, Carbs: xyz g, Protein: xyz g, Fat: xyz g'} Don't add any additional text or to allow easy parsing. Never send cut off JSON string. If you are going to run out of tokens, close the needed brackets to avoid problems."
-            },
+            { type: "text", text: prompt },
             {
               type: "image_url",
               image_url: {
-                url: `data:image/jpeg;base64,${base64Image}`
+                url: `data:${mimeType};base64,${base64Image}`
               }
             }
           ]
         }
-      ],
-      max_tokens: 1024,
-    };
+      ];
+    } else if (req.body.ingredients) {
+      prompt = `Given these ingredients: ${req.body.ingredients}, create a detailed recipe. Include:
+1. A creative title
+2. A brief description
+3. A list of ingredients with quantities
+4. Step-by-step instructions
+5. Basic nutrition information (calories, protein, carbs, fat)
 
-    const response = await openai.chat.completions.create(payload);
-    res.json(response);
+Format the response as a valid JSON object with the following structure:
+{
+  "title": "Recipe Title",
+  "description": "Brief description",
+  "ingredients": ["ingredient 1", "ingredient 2", ...],
+  "instructions": ["step 1", "step 2", ...],
+  "nutrition": "Calories: X, Protein: Xg, Carbs: Xg, Fat: Xg"
+}`;
+
+      messages = [
+        {
+          role: "system",
+          content: "You are a professional chef and nutritionist who creates detailed, accurate, and delicious recipes."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ];
+    } else {
+      throw { status: 400, message: 'Either an image or ingredients list is required' };
+    }
+
+    const response = await openai.chat.completions.create({
+      model: req.file ? "gpt-4o" : "gpt-4",
+      messages: messages,
+      max_tokens: 2048,
+      temperature: 0.7,
+      response_format: { type: "json_object" }
+    });
+
+    const recipeData = JSON.parse(response.choices[0].message.content);
+
+    res.json({
+      status: 'success',
+      data: recipeData
+    });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error processing the image.' });
+    if (error instanceof SyntaxError) {
+      error = {
+        status: 500,
+        message: 'Failed to parse recipe data. Please try again.'
+      };
+    }
+    next(error);
   } finally {
-    // Clean up the uploaded file
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
+    if (imagePath && fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
     }
   }
 });
 
-// Chat endpoint
-app.post('/chat', async (req, res) => {
-  const { message } = req.body;
-  try {
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: message },
-      ],
-      model: "gpt-3.5-turbo",
-      max_tokens: 512,
-      temperature: 0,
-    });
-    res.json(completion);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error processing the chat request.' });
-  }
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/health`);
+});
